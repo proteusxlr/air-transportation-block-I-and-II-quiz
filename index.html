@@ -1,0 +1,1784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Air Transportation (Block I and II Quiz)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        /* Custom styles for correct/incorrect answers */
+        .answer-option {
+            transition: background-color 0.3s ease;
+        }
+        .correct-answer {
+            background-color: #d1fae5; /* Green 100 */
+            border-color: #34d399; /* Green 400 */
+        }
+        .incorrect-answer {
+            background-color: #fee2e2; /* Red 100 */
+            border-color: #ef4444; /* Red 400 */
+        }
+        .disabled-radio:disabled + label {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Modal specific styles */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .modal-content {
+            max-height: 90vh; /* Limit height to prevent overflow */
+            overflow-y: auto; /* Enable scrolling if content exceeds height */
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-gradient-to-br from-indigo-50 to-purple-50">
+
+    <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-lg mb-8 border border-gray-200">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Air Transportation (Block I and II Quiz)</h1>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container">
+            <!-- Question Display -->
+            <div id="question-display" class="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-200 shadow-sm">
+                <p class="text-lg font-semibold text-indigo-800 mb-2" id="question-text"></p>
+                <div id="options-container" class="space-y-3">
+                    <!-- Answer options will be injected here by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Quiz Controls -->
+            <div class="flex flex-col sm:flex-row justify-between gap-4">
+                <button id="submit-btn" class="flex-1 bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition duration-300 ease-in-out shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+                    Submit Answer
+                </button>
+                <button id="next-btn" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-xl hover:bg-green-700 transition duration-300 ease-in-out shadow-md disabled:opacity-50 disabled:cursor-not-allowed font-semibold">
+                    Next Question
+                </button>
+            </div>
+        </div>
+
+        <!-- End of Quiz Section -->
+        <div id="end-quiz-section" class="hidden mt-8 text-center bg-purple-50 p-6 rounded-lg border border-purple-200 shadow-sm">
+            <h2 class="text-2xl font-bold text-purple-800 mb-4">Quiz Completed!</h2>
+            <p class="text-xl text-gray-700 mb-4">Your Score: <span id="final-score" class="font-extrabold text-blue-700"></span></p>
+            <p class="text-lg text-gray-600 mb-6">Average Score (All Attempts): <span id="average-score" class="font-extrabold text-green-700"></span></p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button id="review-btn" class="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition duration-300 ease-in-out shadow-md font-semibold">
+                    Review Answers
+                </button>
+                <button id="restart-btn" class="bg-gray-600 text-white px-6 py-3 rounded-xl hover:bg-gray-700 transition duration-300 ease-in-out shadow-md font-semibold">
+                    Take Another Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Modal -->
+    <div id="review-modal" class="fixed inset-0 hidden flex items-center justify-center z-50 modal-overlay p-4">
+        <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-3xl modal-content border border-gray-300">
+            <div class="flex justify-between items-center mb-6 border-b pb-4">
+                <h3 class="text-2xl font-bold text-gray-800">Quiz Review</h3>
+                <button id="close-review-modal" class="text-gray-500 hover:text-gray-700 text-3xl font-semibold leading-none">&times;</button>
+            </div>
+            <div id="review-content" class="space-y-6">
+                <!-- Review content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Quiz Data
+        const questions = [
+            {
+                question: "Who is responsible for planning, scheduling, and processing eligible passengers, cargo, and mail for air movement?",
+                options: [
+                    { text: "Air Traffic Controllers", isCorrect: false },
+                    { text: "Logistics Managers", isCorrect: false },
+                    { text: "Ground Crew", isCorrect: false },
+                    { text: "Aerial Porters", isCorrect: true }
+                ]
+            },
+            {
+                question: "The Air Force Specialty Code for Air Transportation is:",
+                options: [
+                    { text: "1A2X1", isCorrect: false },
+                    { text: "2T0X1", isCorrect: false },
+                    { text: "2T2X1", isCorrect: true },
+                    { text: "3P0X1", isCorrect: false }
+                ]
+            },
+            {
+                question: "The '2' in the first position of the 2T2X1 AFSC represents our which is Logistics.",
+                options: [
+                    { text: "Skill Level", isCorrect: false },
+                    { text: "Career Grouping", isCorrect: true },
+                    { text: "Specific AFSC", isCorrect: false },
+                    { text: "Subdivision", isCorrect: false }
+                ]
+            },
+            {
+                question: "The 'T' in the second position of the 2T2X1 AFSC represents our, Transportation.",
+                options: [
+                    { text: "Career Grouping", isCorrect: false },
+                    { text: "Skill Level", isCorrect: false },
+                    { text: "Career Field", isCorrect: true },
+                    { text: "Subdivision", isCorrect: false }
+                ]
+            },
+            {
+                question: "The '2' in the third position represents our, Air.",
+                options: [
+                    { text: "Career Field", isCorrect: false },
+                    { text: "Career Grouping", isCorrect: false },
+                    { text: "Specific AFSC", isCorrect: false },
+                    { text: "Subdivision", isCorrect: true }
+                ]
+            },
+            {
+                question: "The fourth position, 'X' is replaced by a, which indicates the current skill level 1,3,5,7, or 9.",
+                options: [
+                    { text: "Letter", isCorrect: false },
+                    { text: "Symbol", isCorrect: false },
+                    { text: "Placeholder", isCorrect: false },
+                    { text: "Number", isCorrect: true }
+                ]
+            },
+            {
+                question: "The '1' in the fifth position, represents the.",
+                options: [
+                    { text: "Career Field", isCorrect: false },
+                    { text: "Skill Level", isCorrect: false },
+                    { text: "Career Grouping", isCorrect: false },
+                    { text: "Specific AFSC", isCorrect: true }
+                ]
+            },
+            {
+                question: "consists of training in actual job situations under supervision.",
+                options: [
+                    { text: "Classroom Training", isCorrect: false },
+                    { text: "On-the-Job Training (OJT)", isCorrect: true },
+                    { text: "Simulated Exercises", isCorrect: false },
+                    { text: "Technical School", isCorrect: false }
+                ]
+            },
+            {
+                question: "Successful completion of Basic Military Training and Technical Training awards the skill level.",
+                options: [
+                    { text: "1-Skill Level", isCorrect: false },
+                    { text: "5-Skill Level", isCorrect: false },
+                    { text: "3-Skill Level", isCorrect: true },
+                    { text: "7-Skill Level", isCorrect: false }
+                ]
+            },
+            {
+                question: "Personnel must be in the grade of or above and show satisfactory performance in all 5-Skill Level positions before beginning 7-Skill Level UGT.",
+                options: [
+                    { text: "SrA", isCorrect: false },
+                    { text: "TSgt", isCorrect: false },
+                    { text: "MSgt", isCorrect: false },
+                    { text: "SSgt", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the vision of the Air Force Mishap Prevention program?",
+                options: [
+                    { text: "To minimize all accidents and injuries.", isCorrect: false },
+                    { text: "To implement strict safety regulations across all units.", isCorrect: false },
+                    { text: "It is the responsibility of all members assigned to an organization to apply accident prevention principles and demonstrate a committed effort to identify and remove hazards in the workplace.", isCorrect: true },
+                    { text: "To ensure that all personnel complete annual safety training.", isCorrect: false }
+                ]
+            },
+            {
+                question: "What are the three priorities the Air Force is committed to under the Air Force Safety Management System (AFSMS)?",
+                options: [
+                    { text: "Prevention, Response, Recovery", isCorrect: false },
+                    { text: "Training, Inspection, Enforcement", isCorrect: false },
+                    { text: "Assessment, Mitigation, Monitoring", isCorrect: false },
+                    { text: "Compliance, Risk Reduction, Continuous Improvement", isCorrect: true }
+                ]
+            },
+            {
+                question: "Name the four pillars that make up the AFSMS.",
+                options: [
+                    { text: "Planning, Execution, Evaluation, Reporting", isCorrect: false },
+                    { text: "Safety Culture, Hazard Control, Emergency Preparedness, Accident Investigation", isCorrect: false },
+                    { text: "Policy and Leadership, Risk Management (RM), Assurance, and Promotion and Education", isCorrect: true },
+                    { text: "Identification, Assessment, Control, Review", isCorrect: false }
+                ]
+            },
+            {
+                question: "List (in order) the five steps in the RM process.",
+                options: [
+                    { text: "Assess, Identify, Develop, Implement, Supervise", isCorrect: false },
+                    { text: "Develop, Identify, Assess, Implement, Supervise", isCorrect: false },
+                    { text: "Implement, Assess, Identify, Develop, Supervise", isCorrect: false },
+                    { text: "1. Identify Hazards, 2. Assess Hazards, 3. Develop Controls and Make Decision, 4. Implement Controls, 5. Supervise and Evaluate", isCorrect: true }
+                ]
+            },
+            {
+                question: "In what situations is a spotter required?",
+                options: [
+                    { text: "When driving at night.", isCorrect: false },
+                    { text: "When operating any vehicle.", isCorrect: false },
+                    { text: "When operating a vehicle on the flight line at any time.", isCorrect: false },
+                    { text: "When operating a vehicle in a confined area, within 10 feet of an aircraft, backing towards an aircraft (25 feet), visibility is limited, or when the operator deems it necessary.", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the purpose of speed limits?",
+                options: [
+                    { text: "To ensure timely operations.", isCorrect: false },
+                    { text: "To maintain vehicle efficiency.", isCorrect: false },
+                    { text: "To comply with international standards.", isCorrect: false },
+                    { text: "Reduce the chance of an accident and the severity of accidents when they occur.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Which Air Force Regulation consolidated all AFOSH standards relating to general operations?",
+                options: [
+                    { text: "AFI 91-202", isCorrect: false },
+                    { text: "AFMAN 91-201", isCorrect: false },
+                    { text: "AFI 91-203", isCorrect: true },
+                    { text: "AFMAN 91-203", isCorrect: false }
+                ]
+            },
+            {
+                question: "What is the purpose of the AFOSH programs?",
+                options: [
+                    { text: "To enhance mission effectiveness.", isCorrect: false },
+                    { text: "To provide training on equipment usage.", isCorrect: false },
+                    { text: "To standardize operational procedures.", isCorrect: false },
+                    { text: "To provide a safe and healthy working environment for all military and civilian employees.", isCorrect: true }
+                ]
+            },
+            {
+                question: "If action is not taken to identify and correct hazards, who should be contacted?",
+                options: [
+                    { text: "Unit Commander", isCorrect: false },
+                    { text: "Safety Office", isCorrect: false },
+                    { text: "Wing Commander", isCorrect: false },
+                    { text: "Supervisor", isCorrect: true }
+                ]
+            },
+            {
+                question: "What form needs to be filled out for a USAF Hazard Report?",
+                options: [
+                    { text: "AF Form 978", isCorrect: false },
+                    { text: "AF Form 1118", isCorrect: false },
+                    { text: "AF Form 204", isCorrect: false },
+                    { text: "AF Form 457", isCorrect: true }
+                ]
+            },
+            {
+                question: "If hazards cannot be eliminated immediately should be reported to who?",
+                options: [
+                    { text: "Local Police Department", isCorrect: false },
+                    { text: "Air Force Personnel Center", isCorrect: false },
+                    { text: "The Occupational Safety and Health Administration (OSHA)", isCorrect: false },
+                    { text: "Installation Ground Safety Officer", isCorrect: true }
+                ]
+            },
+            {
+                question: "What are the five common hazards found in the 2T2X1 career field?",
+                options: [
+                    { text: "Chemical spills, electrical issues, fire, inadequate lighting, poor ventilation", isCorrect: false },
+                    { text: "Extreme temperatures, lack of personal protective equipment, fatigue, improper lifting, confined spaces", isCorrect: false },
+                    { text: "Exposure to hazardous materials, slips/trips/falls, vehicle collisions, sharp objects, repetitive motions", isCorrect: false },
+                    { text: "Lifting, use of Materials Handling Equipment (MHE), heights, noise, and jewelry", isCorrect: true }
+                ]
+            },
+            {
+                question: "According to statistics, what is one of the most common lost-time injuries?",
+                options: [
+                    { text: "Back strains", isCorrect: false },
+                    { text: "Eye injuries", isCorrect: false },
+                    { text: "Ankle sprains", isCorrect: false },
+                    { text: "Snagged finger rings", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the most widely accepted and taught method of lifting?",
+                options: [
+                    { text: "Straight-leg lifting", isCorrect: false },
+                    { text: "Overhand lifting", isCorrect: false },
+                    { text: "Back lifting", isCorrect: false },
+                    { text: "Kinetic lifting", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the first step before properly lifting an object?",
+                options: [
+                    { text: "Warm up with stretches.", isCorrect: false },
+                    { text: "Get assistance from a coworker.", isCorrect: false },
+                    { text: "Ensure the path is clear.", isCorrect: false },
+                    { text: "Inspect the object", isCorrect: true }
+                ]
+            },
+            {
+                question: "What are the common types of PPE utilized by 2T2s?",
+                options: [
+                    { text: "Hard hats, reflective vests, earplugs, safety glasses, respirators", isCorrect: false },
+                    { text: "Chemical suits, face masks, steel-toed boots, safety harnesses, gloves", isCorrect: false },
+                    { text: "Hearing protection, safety goggles, hard hats, reflective vests, gloves", isCorrect: false },
+                    { text: "Steel toe boots, gloves, goggles, face shield, and hearing protection", isCorrect: true }
+                ]
+            },
+            {
+                question: "USTRANSCOM's Mission is to provide full spectrum global mobility solutions and enabling capabilities for supported customer requirements in and.",
+                options: [
+                    { text: "Conflict, stability", isCorrect: false },
+                    { text: "Disaster relief, humanitarian aid", isCorrect: false },
+                    { text: "Training, deployment", isCorrect: false },
+                    { text: "Peace, war", isCorrect: true }
+                ]
+            },
+            {
+                question: "Air Mobility Command's (AMC's) mission is to 'provide global air mobility... ______ ______, ______ ______, ______ ______'.",
+                options: [
+                    { text: "Efficiently, effectively, safely", isCorrect: false },
+                    { text: "Anytime, anywhere, anyhow", isCorrect: false },
+                    { text: "Personnel, equipment, supplies", isCorrect: false },
+                    { text: "Right effects, right place, right time", isCorrect: true }
+                ]
+            },
+            {
+                question: "AMC uses military and commercial aircraft to transport its cargo, passengers, and mail commonly referred to as '__________'.",
+                options: [
+                    { text: "Freight", isCorrect: false },
+                    { text: "Logistics", isCorrect: false },
+                    { text: "Deliveries", isCorrect: false },
+                    { text: "Traffic", isCorrect: true }
+                ]
+            },
+            {
+                question: "An __________ _________ ___________ is typically located in the Continental United States (CONUS) and consists mostly of air transportation and traffic management personnel.",
+                options: [
+                    { text: "Air Terminal Squadron", isCorrect: false },
+                    { text: "Air Logistics Squadron", isCorrect: false },
+                    { text: "Air Operations Squadron", isCorrect: false },
+                    { text: "Aerial Port Squadron", isCorrect: true }
+                ]
+            },
+            {
+                question: "An _______ ___________ _________ is typically composed of air transportation and aircraft maintenance personnel and serves as an enroute station or in-transit hub for cargo and passenger movement between specified regions.",
+                options: [
+                    { text: "Air Logistics Center", isCorrect: false },
+                    { text: "Air Expeditionary Squadron", isCorrect: false },
+                    { text: "Air Operations Center", isCorrect: false },
+                    { text: "Air Mobility Squadron", isCorrect: true }
+                ]
+            },
+            {
+                question: "The mission of Contingency Response Groups (CRGs's) is to deploy its personnel within to open air bases or augment existing air bases worldwide.",
+                options: [
+                    { text: "24 hours", isCorrect: false },
+                    { text: "48 hours", isCorrect: false },
+                    { text: "72 hours", isCorrect: false },
+                    { text: "12 hours", isCorrect: true }
+                ]
+            },
+            {
+                question: "Air Transportation personnel within an ___________________ are typically assigned to a Deployment and Distribution Flight.",
+                options: [
+                    { text: "Force Support Squadron (FSS)", isCorrect: false },
+                    { text: "Civil Engineer Squadron (CES)", isCorrect: false },
+                    { text: "Maintenance Squadron (MXS)", isCorrect: false },
+                    { text: "Logistics Readiness Squadron (LRS)", isCorrect: true }
+                ]
+            },
+            {
+                question: "The __________________ organizes aerial port squadrons at a functional level typically as small, medium, large and super.",
+                options: [
+                    { text: "Air Combat Command (ACC)", isCorrect: false },
+                    { text: "Air Force Global Strike Command (AFGSC)", isCorrect: false },
+                    { text: "Air Education and Training Command (AETC)", isCorrect: false },
+                    { text: "Air Force Reserve Command (AFRC)", isCorrect: true }
+                ]
+            },
+            {
+                question: "______ ________ controls, coordinates, plans, and directs all cargo and mail activities. There are several sections, Cargo Processing, Ramp Services, and Special Handling.",
+                options: [
+                    { text: "Passenger Operations", isCorrect: false },
+                    { text: "Traffic Management", isCorrect: false },
+                    { text: "Fleet Service", isCorrect: false },
+                    { text: "Air Freight", isCorrect: true }
+                ]
+            },
+            {
+                question: "_____________ is responsible for the planning and control of all operations within the APS or AMS.",
+                options: [
+                    { text: "Ramp Services", isCorrect: false },
+                    { text: "Special Handling", isCorrect: false },
+                    { text: "Cargo Processing", isCorrect: false },
+                    { text: "Air Terminal Operations (ATO)", isCorrect: true }
+                ]
+            },
+            {
+                question: "____________________, commonly referred to as Passenger Service, plans and controls all passenger service activities.",
+                options: [
+                    { text: "Air Freight", isCorrect: false },
+                    { text: "Air Terminal Operations (ATO)", isCorrect: false },
+                    { text: "Fleet Service", isCorrect: false },
+                    { text: "Passenger Operations", isCorrect: true }
+                ]
+            },
+            {
+                question: "What station serves as an authorized port to process and clear aircraft and traffic for departure from the country where located?",
+                options: [
+                    { text: "APOD", isCorrect: false },
+                    { text: "APCC", isCorrect: false },
+                    { text: "APT", isCorrect: false },
+                    { text: "APOE", isCorrect: true }
+                ]
+            },
+            {
+                question: "What station serves as an authorized port to process and clear aircraft and traffic for entrance into the country where located?",
+                options: [
+                    { text: "APOE", isCorrect: false },
+                    { text: "APCC", isCorrect: false },
+                    { text: "APT", isCorrect: false },
+                    { text: "APOD", isCorrect: true }
+                ]
+            },
+            {
+                question: "There are __ installations currently designated as Aerial Ports in the CONUS.",
+                options: [
+                    { text: "5", isCorrect: false },
+                    { text: "10", isCorrect: false },
+                    { text: "12", isCorrect: false },
+                    { text: "8", isCorrect: true }
+                ]
+            },
+            {
+                question: "GATES is a real-time IGC feeder system supporting _________, __________ and ________ sites.",
+                options: [
+                    { text: "Commercial, military, civilian", isCorrect: false },
+                    { text: "Air, sea, land", isCorrect: false },
+                    { text: "CONUS, OCONUS, international", isCorrect: false },
+                    { text: "Fixed, deployed, mobile", isCorrect: true }
+                ]
+            },
+            {
+                question: "ITV is used to track cargo on military/commercial ________, __________, and ___________ assets.",
+                options: [
+                    { text: "Rail, truck, ship", isCorrect: false },
+                    { text: "Helicopters, planes, boats", isCorrect: false },
+                    { text: "Trains, vehicles, vessels", isCorrect: false },
+                    { text: "Aircraft, sealift, surface", isCorrect: true }
+                ]
+            },
+            {
+                question: "________ is the DoDs single designated source for ITV (In-Transit Visibility).",
+                options: [
+                    { text: "GATES", isCorrect: false },
+                    { text: "CMOS", isCorrect: false },
+                    { text: "ICODES", isCorrect: false },
+                    { text: "IGC (Integrated Data Environment & Global Transportation Network Convergence)", isCorrect: true }
+                ]
+            },
+            {
+                question: "_______ is the ITV system used for wing level deployments and contingency operations.",
+                options: [
+                    { text: "GATES", isCorrect: false },
+                    { text: "ICODES", isCorrect: false },
+                    { text: "GDSS II", isCorrect: false },
+                    { text: "CMOS", isCorrect: true }
+                ]
+            },
+            {
+                question: "ICODES provides end-to-end supply chain visibility through multiple facets, to include: ______________ _____________, ____________ _____________ , and ___________ ______________.",
+                options: [
+                    { text: "Inventory management, vehicle tracking, personnel deployment", isCorrect: false },
+                    { text: "Cargo screening, manifest generation, customs clearance", isCorrect: false },
+                    { text: "Asset allocation, route optimization, real-time updates", isCorrect: false },
+                    { text: "Distribution forecasting, mission planning, information visualization", isCorrect: true }
+                ]
+            },
+            {
+                question: "GDSS II allows the user to share information across classified/unclassified domains, with the ability to ________, ________, and ______________________.",
+                options: [
+                    { text: "Collect, analyze, distribute", isCorrect: false },
+                    { text: "Store, retrieve, modify", isCorrect: false },
+                    { text: "Input, process, output", isCorrect: false },
+                    { text: "Plan, source, schedule", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is a USTRANSCOM funded system that provides command and control information to combatant commanders?",
+                options: [
+                    { text: "GATES", isCorrect: false },
+                    { text: "ICODES", isCorrect: false },
+                    { text: "CMOS", isCorrect: false },
+                    { text: "GDSS II (Global Decision Support System II)", isCorrect: true }
+                ]
+            },
+            {
+                question: "In order to operate a vehicle on the airfield, all members must complete all training outlined in ___________________.",
+                options: [
+                    { text: "AFI 13-201", isCorrect: false },
+                    { text: "AFI 13-210", isCorrect: false },
+                    { text: "AFI 13-211", isCorrect: false },
+                    { text: "AFI 13-213", isCorrect: true }
+                ]
+            },
+            {
+                question: "The required forms to operate a vehicle on a flight line are the ____________, ______________, and ____________.",
+                options: [
+                    { text: "AF Form 1800, AF Form 2293, and AF Form 483", isCorrect: false },
+                    { text: "AF Form 1199, AF Form 1800, and AF Form 483", isCorrect: false },
+                    { text: "AF Form 1199, AF Form 2293, and AF Form 1800", isCorrect: false },
+                    { text: "AF Form 1199, AF Form 2293, and AF Form 483", isCorrect: true }
+                ]
+            },
+            {
+                question: "_____________ grants access to the flight line.",
+                options: [
+                    { text: "AF Form 2293", isCorrect: false },
+                    { text: "AF Form 483", isCorrect: false },
+                    { text: "AF Form 1800", isCorrect: false },
+                    { text: "AF Form 1199", isCorrect: true }
+                ]
+            },
+            {
+                question: "The _________ is a record of personnel who are qualified to operate specific vehicles.",
+                options: [
+                    { text: "AF Form 1199", isCorrect: false },
+                    { text: "AF Form 483", isCorrect: false },
+                    { text: "AF Form 1800", isCorrect: false },
+                    { text: "AF Form 2293", isCorrect: true }
+                ]
+            },
+            {
+                question: "Certificate of Competency",
+                options: [
+                    { text: "AF Form 1199", isCorrect: false },
+                    { text: "AF Form 2293", isCorrect: false },
+                    { text: "AF Form 1800", isCorrect: false },
+                    { text: "AF Form 483", isCorrect: true }
+                ]
+            },
+            {
+                question: "The required minimum PPE for the flight line includes ___________, ______________, and _____________.",
+                options: [
+                    { text: "Hard hat, reflective vest, safety glasses", isCorrect: false },
+                    { text: "Full-face shield, earplugs, steel-toed boots", isCorrect: false },
+                    { text: "Safety harness, gloves, hard hat", isCorrect: false },
+                    { text: "Gloves, steel toe boots, hearing protection", isCorrect: true }
+                ]
+            },
+            {
+                question: "Obey all _____________ checkpoints signs posted at every entrance to ramp areas and flight line.",
+                options: [
+                    { text: "Personnel Only", isCorrect: false },
+                    { text: "Authorized Access", isCorrect: false },
+                    { text: "Restricted Area", isCorrect: false },
+                    { text: "Foreign Object Damage (FOD)", isCorrect: true }
+                ]
+            },
+            {
+                question: "Do not park or drive less than _____ feet in front or ______ feet behind aircraft with running engines.",
+                options: [
+                    { text: "50, 100", isCorrect: false },
+                    { text: "10, 50", isCorrect: false },
+                    { text: "15, 75", isCorrect: false },
+                    { text: "25, 200", isCorrect: true }
+                ]
+            },
+            {
+                question: "General purpose vehicles should have a speed limit of what while driving on the flight line?",
+                options: [
+                    { text: "5 miles per hour", isCorrect: false },
+                    { text: "10 miles per hour", isCorrect: false },
+                    { text: "20 miles per hour", isCorrect: false },
+                    { text: "15 miles per hour", isCorrect: true }
+                ]
+            },
+            {
+                question: "Special purpose vehicles should have a speed limit of what on the flight line?",
+                options: [
+                    { text: "5 miles per hour", isCorrect: false },
+                    { text: "15 miles per hour", isCorrect: false },
+                    { text: "20 miles per hour", isCorrect: false },
+                    { text: "10 miles per hour", isCorrect: true }
+                ]
+            },
+            {
+                question: "Never drive a vehicle between a taxiing aircraft and the ____________.",
+                options: [
+                    { text: "Control tower", isCorrect: false },
+                    { text: "Terminal building", isCorrect: false },
+                    { text: "Hangar", isCorrect: false },
+                    { text: "Follow Me Truck", isCorrect: true }
+                ]
+            },
+            {
+                question: "A _____________ light signals tells the driver to return to starting point.",
+                options: [
+                    { text: "Steady green light", isCorrect: false },
+                    { text: "Steady red light", isCorrect: false },
+                    { text: "Flashing red light", isCorrect: false },
+                    { text: "Flashing white light", isCorrect: true }
+                ]
+            },
+            {
+                question: "A _____________ light signals tells the driver it's clear to cross.",
+                options: [
+                    { text: "Flashing white light", isCorrect: false },
+                    { text: "Steady red light", isCorrect: false },
+                    { text: "Flashing red light", isCorrect: false },
+                    { text: "Steady green", isCorrect: true }
+                ]
+            },
+            {
+                question: "A __________ light signals tells the driver to stop. Do not move vehicle.",
+                options: [
+                    { text: "Flashing white light", isCorrect: false },
+                    { text: "Steady green light", isCorrect: false },
+                    { text: "Flashing red light", isCorrect: false },
+                    { text: "Steady red", isCorrect: true }
+                ]
+            },
+            {
+                question: "A ___________ light signals tells the driver to clear active taxiway/runway.",
+                options: [
+                    { text: "Flashing white light", isCorrect: false },
+                    { text: "Steady green light", isCorrect: false },
+                    { text: "Steady red light", isCorrect: false },
+                    { text: "Flashing red light", isCorrect: true }
+                ]
+            },
+            {
+                question: "A _______ and ________ light signals the driver there is a General Warning. Exercise extreme caution.",
+                options: [
+                    { text: "White, green", isCorrect: false },
+                    { text: "Green, yellow", isCorrect: false },
+                    { text: "Yellow, red", isCorrect: true },
+                    { text: "Red, green", isCorrect: false }
+                ]
+            },
+            {
+                question: "AFVA 11-240",
+                options: [
+                    { text: "Air Force Vehicle Regulations", isCorrect: false },
+                    { text: "Airfield Operations Manual", isCorrect: false },
+                    { text: "Flight Line Safety Standards", isCorrect: false },
+                    { text: "USAF Airport Signs and Markings", isCorrect: true }
+                ]
+            },
+            {
+                question: "ATSEP provides organizations the tools to validate __________ with established operational and training ______________.",
+                options: [
+                    { text: "Procedures, guidelines", isCorrect: false },
+                    { text: "Efficiency, protocols", isCorrect: false },
+                    { text: "Performance, objectives", isCorrect: false },
+                    { text: "Compliance, directives", isCorrect: true }
+                ]
+            },
+            {
+                question: "Deficiencies that violate established guidance but had no immediate threat of personal injury, damage to equipment or property, or mission degradation",
+                options: [
+                    { text: "Critical Findings", isCorrect: false },
+                    { text: "Significant Findings", isCorrect: false },
+                    { text: "Observation", isCorrect: false },
+                    { text: "Minor Findings", isCorrect: true }
+                ]
+            },
+            {
+                question: "Deficiencies that, if not found, can cause potential personal injury, damage to equipment or property, or severe mission degradation",
+                options: [
+                    { text: "Minor Findings", isCorrect: false },
+                    { text: "Critical Findings", isCorrect: false },
+                    { text: "Observation", isCorrect: false },
+                    { text: "Significant Findings", isCorrect: true }
+                ]
+            },
+            {
+                question: "Deficiencies that did result in personal injury, damage to equipment or property, or severe mission degradation",
+                options: [
+                    { text: "Minor Findings", isCorrect: false },
+                    { text: "Significant Findings", isCorrect: false },
+                    { text: "Observation", isCorrect: false },
+                    { text: "Critical Findings", isCorrect: true }
+                ]
+            },
+            {
+                question: "Air Transportation Standardization Evaluation Program (ATSEP) provides commanders and ______ with assessments of a unit's ability to perform core air transportation procedures.",
+                options: [
+                    { text: "Air Force Operations Center (AFOC)", isCorrect: false },
+                    { text: "Air Force Logistics Command (AFLC)", isCorrect: false },
+                    { text: "Air Force Installation and Mission Support Center (AFIMSC)", isCorrect: false },
+                    { text: "Headquarters AMC (Air Mobility Command)", isCorrect: true }
+                ]
+            },
+            {
+                question: "Quality Assurance (QA) personnel evaluate the performance of ________ __________ performed within the organization.",
+                options: [
+                    { text: "Administrative tasks", isCorrect: false },
+                    { text: "Financial processes", isCorrect: false },
+                    { text: "Personnel evaluations", isCorrect: false },
+                    { text: "Logistics procedures", isCorrect: true }
+                ]
+            },
+            {
+                question: "Do not park or drive less than ________ feet in front or _________ feet behind aircraft while running engines.",
+                options: [
+                    { text: "10, 50", isCorrect: false },
+                    { text: "50, 100", isCorrect: false },
+                    { text: "15, 75", isCorrect: false },
+                    { text: "25, 200", isCorrect: true }
+                ]
+            },
+            {
+                question: "_________ are defined as the observed events or conditions with safety implication or technical violations not related to an evaluation or inspection.",
+                options: [
+                    { text: "Findings", isCorrect: false },
+                    { text: "Discrepancies", isCorrect: false },
+                    { text: "Incidents", isCorrect: false },
+                    { text: "Observations", isCorrect: true }
+                ]
+            },
+            {
+                question: "The ______________ is a checklist and outlines the key items to inspect.",
+                options: [
+                    { text: "AF Form 240", isCorrect: false },
+                    { text: "AF Form 623", isCorrect: false },
+                    { text: "AF Form 978", isCorrect: false },
+                    { text: "AF Form 1800", isCorrect: true }
+                ]
+            },
+            {
+                question: "The owning/ using organization will place an ___________ in the column adjacent to the specific area items that need to be inspected for the vehicle.",
+                options: [
+                    { text: "'Check'", isCorrect: false },
+                    { text: "'O'", isCorrect: false },
+                    { text: "'C'", isCorrect: false },
+                    { text: "'X'", isCorrect: true }
+                ]
+            },
+            {
+                question: "Vehicle operator will annotate vehicle tire pressure on page ______ of the AF Form 1800",
+                options: [
+                    { text: "1", isCorrect: false },
+                    { text: "2", isCorrect: true },
+                    { text: "3", isCorrect: false },
+                    { text: "4", isCorrect: false }
+                ]
+            },
+            {
+                question: "Once the vehicle inspection has been fully accomplished, the vehicle operator will use the _______ _______ space to certify completion.",
+                options: [
+                    { text: "Date, Time", isCorrect: false },
+                    { text: "Vehicle, Operator", isCorrect: false },
+                    { text: "Inspection, Status", isCorrect: false },
+                    { text: "Operator Signature", isCorrect: true }
+                ]
+            },
+            {
+                question: "463L pallet has a Desired Cargo Load Capacity of what?",
+                options: [
+                    { text: "5,000 lbs", isCorrect: false },
+                    { text: "10,000 lbs", isCorrect: false },
+                    { text: "15,000 lbs", isCorrect: false },
+                    { text: "7,500 lbs", isCorrect: true }
+                ]
+            },
+            {
+                question: "The actual dimensions of a 463L pallet is what?",
+                options: [
+                    { text: "88 inches (L), 108 inches (W), 2.25 inches (H)", isCorrect: false },
+                    { text: "104 inches (L), 84 inches (W), 2.25 inches (H)", isCorrect: false },
+                    { text: "108 inches (L), 88 inches (W), 4 inches (H)", isCorrect: false },
+                    { text: "108 inches (L), 88 inches (W), 2.25 inches (H)", isCorrect: true }
+                ]
+            },
+            {
+                question: "If a discrepancy is found during the inspection, it should be documented correctly and reported to _____________ for correction immediately.",
+                options: [
+                    { text: "Supply", isCorrect: false },
+                    { text: "Operations", isCorrect: false },
+                    { text: "Leadership", isCorrect: false },
+                    { text: "Maintenance", isCorrect: true }
+                ]
+            },
+            {
+                question: "Enter the current ________ and ________ that is displayed when the discrepancy was found.",
+                options: [
+                    { text: "Date, Time", isCorrect: true },
+                    { text: "Make, Model", isCorrect: false },
+                    { text: "Unit, Location", isCorrect: false },
+                    { text: "Miles, hours", isCorrect: false }
+                ]
+            },
+            {
+                question: "Side nets weigh ____ lbs and a top net weighs _____ lbs. The total weight of a complete net set is _____ lbs.",
+                options: [
+                    { text: "20, 20, 60", isCorrect: false },
+                    { text: "25, 20, 70", isCorrect: false },
+                    { text: "21, 22, 64", isCorrect: true },
+                    { text: "22, 21, 65", isCorrect: false }
+                ]
+            },
+            {
+                question: "The 463L Pallet is made of a _- or __________ core, sandwiched between two corrosion resistant aluminum face skins.",
+                options: [
+                    { text: "Particle-board, plastic", isCorrect: false },
+                    { text: "Composite-fiber, foam", isCorrect: true },
+                    { text: "Plywood, steel", isCorrect: false },
+                    { text: "Balsa-wood, redwood", isCorrect: false }
+                ]
+            },
+            {
+                question: "The pallet rails consists of ______ steel tie-down rings, ________ rings on the long side and _______ rings on the short side.",
+                options: [
+                    { text: "20, 5, 5", isCorrect: false },
+                    { text: "24, 8, 4", isCorrect: false },
+                    { text: "18, 6, 3", isCorrect: false },
+                    { text: "22, 6, 5", isCorrect: true }
+                ]
+            },
+            {
+                question: "The usable dimensions of a 463L pallet are ______ X _______.",
+                options: [
+                    { text: "108 inches, 88 inches", isCorrect: false },
+                    { text: "96 inches, 76 inches", isCorrect: true },
+                    { text: "100 inches, 80 inches", isCorrect: false },
+                    { text: "104 inches, 84 inches", isCorrect: false }
+                ]
+            },
+            {
+                question: "A green repairable tag, used to identify items which have sustained minor damage but can be repaired.",
+                options: [
+                    { text: "DD Form 1577", isCorrect: false },
+                    { text: "DD Form 1348-1A", isCorrect: false },
+                    { text: "DD Form 1348", isCorrect: false },
+                    { text: "DD Form 1577-2", isCorrect: true }
+                ]
+            },
+            {
+                question: "A red condemned tag, used for items that have suffered major damage and should not be returned to inventory.",
+                options: [
+                    { text: "DD Form 1577-2", isCorrect: false },
+                    { text: "DD Form 1348-1A", isCorrect: false },
+                    { text: "DD Form 1348", isCorrect: false },
+                    { text: "DD Form 1577", isCorrect: true }
+                ]
+            },
+            {
+                question: "All empty pallet weigh _______ lbs. and have a maximum load capacity of _______ lbs. or ________ lbs. psi.",
+                options: [
+                    { text: "300; 8,000; 200", isCorrect: false },
+                    { text: "250; 9,000; 220", isCorrect: false },
+                    { text: "280; 12,000; 280", isCorrect: false },
+                    { text: "290; 10,000; 250", isCorrect: true }
+                ]
+            },
+            {
+                question: "The rated capacity of a CGU-1/B is _________ lbs. with an overall strap length of _____ feet.",
+                options: [
+                    { text: "4,000; 15", isCorrect: false },
+                    { text: "6,000; 25", isCorrect: false },
+                    { text: "3,000; 18", isCorrect: false },
+                    { text: "5,000; 20", isCorrect: true }
+                ]
+            },
+            {
+                question: "The maximum rated capacity of the MB-1 device is ______ lbs.",
+                options: [
+                    { text: "5,000", isCorrect: false },
+                    { text: "7,500", isCorrect: false },
+                    { text: "12,000", isCorrect: false },
+                    { text: "10,000", isCorrect: true }
+                ]
+            },
+            {
+                question: "The main feature of the _______ and ________ is the quick release lever.",
+                options: [
+                    { text: "CGU-1/B, DD Form 2133", isCorrect: false },
+                    { text: "MB-3, MB-4", isCorrect: false },
+                    { text: "463L pallet, side nets", isCorrect: false },
+                    { text: "MB-1, MB-2", isCorrect: true }
+                ]
+            },
+            {
+                question: "The types of damage that causes a pallet to be unserviceable are ____________, _____________, and _______________.",
+                options: [
+                    { text: "Scratches, dents, fading", isCorrect: false },
+                    { text: "Cracks, punctures, bending", isCorrect: false },
+                    { text: "Abrasions, corrosion, chipping", isCorrect: false },
+                    { text: "Delamination, warping, damage", isCorrect: true }
+                ]
+            },
+            {
+                question: "When inspecting the ___________ you need to look for frays/rips in the __________ and missing or damaged hooks/rings.",
+                options: [
+                    { text: "Straps, buckles", isCorrect: false },
+                    { text: "Pallet, surface", isCorrect: false },
+                    { text: "D rings, webbing", isCorrect: false },
+                    { text: "Nets, webbing", isCorrect: true }
+                ]
+            },
+            {
+                question: "When stacking pallets, group in sets of ____________. Use __________ pieces of dunnage between each set.",
+                options: [
+                    { text: "5, 2", isCorrect: false },
+                    { text: "8, 4", isCorrect: false },
+                    { text: "12, 2", isCorrect: false },
+                    { text: "10, 3", isCorrect: true }
+                ]
+            },
+            {
+                question: "When storing nets for ________ _____________ , hang on a ___________ ___________.",
+                options: [
+                    { text: "Long-term storage, dry shelf", isCorrect: false },
+                    { text: "Temporary holding, floor space", isCorrect: false },
+                    { text: "Maintenance, work bench", isCorrect: false },
+                    { text: "Daily use, net rack", isCorrect: true }
+                ]
+            },
+            {
+                question: "All aerial port squadrons have designated representatives appointed by the ____________ _____________ as the pallet/net managers.",
+                options: [
+                    { text: "First Sergeant", isCorrect: false },
+                    { text: "Chief of Logistics", isCorrect: false },
+                    { text: "Operations Officer", isCorrect: false },
+                    { text: "Unit commander", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is a stowaway?",
+                options: [
+                    { text: "A passenger with undeclared cargo.", isCorrect: false },
+                    { text: "A person traveling without proper identification.", isCorrect: false },
+                    { text: "A passenger who boards the wrong aircraft.", isCorrect: false },
+                    { text: "An unauthorized person aboard on aircraft not listed on the flight manifest.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Where can you find out who qualifies as a Distinguished Visitor?",
+                options: [
+                    { text: "DoD 4515.13-R", isCorrect: false },
+                    { text: "Joint Travel Regulation (JTR)", isCorrect: true },
+                    { text: "Local Operating Instructions", isCorrect: false },
+                    { text: "AFI 34-1201", isCorrect: false }
+                ]
+            },
+            {
+                question: "What category of passenger is traveling in connection with the death of immediate family member?",
+                options: [
+                    { text: "Space-A passenger", isCorrect: false },
+                    { text: "Special Category passenger", isCorrect: false },
+                    { text: "DV passenger", isCorrect: false },
+                    { text: "Blue Bark", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the first step in determining when a unique passenger can fly?",
+                options: [
+                    { text: "Check their medical records.", isCorrect: false },
+                    { text: "Obtain supervisor approval.", isCorrect: false },
+                    { text: "Verify their travel orders.", isCorrect: false },
+                    { text: "Establish whether or not the passenger is eligible for travel per DoDI 4515.13.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Where will the passengers with disabilities be seated?",
+                options: [
+                    { text: "Near the emergency exits.", isCorrect: false },
+                    { text: "In designated accessible seating.", isCorrect: false },
+                    { text: "At the front of the aircraft.", isCorrect: false },
+                    { text: "Best seats available", isCorrect: true }
+                ]
+            },
+            {
+                question: "Which type of passengers requires you to make a special announcement in the terminal to notify other passengers of the circumstance?",
+                options: [
+                    { text: "Unaccompanied minors", isCorrect: false },
+                    { text: "Medical patients", isCorrect: false },
+                    { text: "Distinguished visitors", isCorrect: false },
+                    { text: "Prisoners and guards", isCorrect: true }
+                ]
+            },
+            {
+                question: "Through how many weeks may a pregnant passenger be eligible to travel?",
+                options: [
+                    { text: "30 weeks, 4 weeks postpartum", isCorrect: false },
+                    { text: "32 weeks, 5 weeks postpartum", isCorrect: false },
+                    { text: "36 weeks, 8 weeks postpartum", isCorrect: false },
+                    { text: "34 weeks, 6 weeks postpartum", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is one of the greatest tools a PSA has to help enhance a passenger's experience while flying with AMC.",
+                options: [
+                    { text: "Providing entertainment", isCorrect: false },
+                    { text: "Offering refreshments", isCorrect: false },
+                    { text: "Assisting with baggage", isCorrect: false },
+                    { text: "Keeping passengers informed", isCorrect: true }
+                ]
+            },
+            {
+                question: "Passengers depend on PSAs to pass accurate and timely information on all matters regarding their flight. This will include information concerning what?",
+                options: [
+                    { text: "Aircraft capacity and fuel levels.", isCorrect: false },
+                    { text: "Pilot and crew details.", isCorrect: false },
+                    { text: "Maintenance schedules and procedures.", isCorrect: false },
+                    { text: "The estimated time of departure (ETD), estimated time of arrival (ETA), roll-call times, information regarding aircraft delays.", isCorrect: true }
+                ]
+            },
+            {
+                question: "How often should an announcement be made for flights that are delayed more than six hours?",
+                options: [
+                    { text: "Every hour", isCorrect: false },
+                    { text: "2 hours", isCorrect: true },
+                    { text: "Every 30 minutes", isCorrect: false },
+                    { text: "Every 4 hours", isCorrect: false }
+                ]
+            },
+            {
+                question: "What are some amenities terminals have for passengers?",
+                options: [
+                    { text: "Gym, spa, swimming pool", isCorrect: false },
+                    { text: "Movie theater, bowling alley, arcade", isCorrect: false },
+                    { text: "Retail stores, gourmet restaurants, VIP lounges", isCorrect: false },
+                    { text: "Dependent lounge, passenger lounge, cafeteria/uso, special category lounge", isCorrect: true }
+                ]
+            },
+            {
+                question: "Where is the template located for AMC Form 76?",
+                options: [
+                    { text: "On the GATES system.", isCorrect: false },
+                    { text: "In the Passenger Service Manual.", isCorrect: false },
+                    { text: "On the AMC Portal.", isCorrect: false },
+                    { text: "HQ/AMC A4TP's Air Transportation Passenger/Fleet policy website page", isCorrect: true }
+                ]
+            },
+            {
+                question: "When does the AMC Form 76 get updated?",
+                options: [
+                    { text: "Biannually or as needed.", isCorrect: false },
+                    { text: "Every five years.", isCorrect: false },
+                    { text: "Monthly.", isCorrect: false },
+                    { text: "Annually or when significant changes occur.", isCorrect: true }
+                ]
+            },
+            {
+                question: "All major passengers terminals have a ___________ _________ system installed linking security forces for the passenger terminal.",
+                options: [
+                    { text: "Surveillance camera", isCorrect: false },
+                    { text: "Communication network", isCorrect: false },
+                    { text: "Access control", isCorrect: false },
+                    { text: "Duress alarm", isCorrect: true }
+                ]
+            },
+            {
+                question: "Security inspections will be performed in conjunction with __________ _________ ___________ measures IAW AFI 10-245, Antiterrorism.",
+                options: [
+                    { text: "Crime prevention", isCorrect: false },
+                    { text: "Emergency response", isCorrect: false },
+                    { text: "Threat assessment", isCorrect: false },
+                    { text: "Force Protection Condition (FPCON)", isCorrect: true }
+                ]
+            },
+            {
+                question: "The activating device (button/switch) must be located ______ _____ public view.",
+                options: [
+                    { text: "Easily accessible to", isCorrect: false },
+                    { text: "Clearly marked in", isCorrect: false },
+                    { text: "Hidden from", isCorrect: true },
+                    { text: "Out of", isCorrect: false }
+                ]
+            },
+            {
+                question: "Each unit develops directives for the operation and __________ testing of the duress alarm system.",
+                options: [
+                    { text: "Daily", isCorrect: false },
+                    { text: "Weekly", isCorrect: true },
+                    { text: "Monthly", isCorrect: false },
+                    { text: "Quarterly", isCorrect: false }
+                ]
+            },
+            {
+                question: "Air Terminals will develop locally produced __________ ___________ __________ to respond to a Suspicious Package, Robbery, Bomb Threat and Unattended Baggage.",
+                options: [
+                    { text: "Standard Operating Procedures (SOPs)", isCorrect: false },
+                    { text: "Emergency Action Plans (EAPs)", isCorrect: false },
+                    { text: "Contingency Response Guides (CRGs)", isCorrect: false },
+                    { text: "Quick Reaction Checklists (QRC's)", isCorrect: true }
+                ]
+            },
+            {
+                question: "The decision to deny boarding will be made by the ________ _________ but may be elevated as high as the __________ ____________ depending on the circumstances and rank of the person in question.",
+                options: [
+                    { text: "Terminal Manager, Air Force Commander", isCorrect: false },
+                    { text: "Security Supervisor, Base Commander", isCorrect: false },
+                    { text: "Passenger Service Chief, Wing Commander", isCorrect: false },
+                    { text: "Shift supervisor, Installation command", isCorrect: true }
+                ]
+            },
+            {
+                question: "Instances of unacceptable passenger conduct or behavior that warrants consideration for removal of Space-A privileges will be forwarded to HQ AMC and then to the appropriate ___________ ____________ for the right decision.",
+                options: [
+                    { text: "Legal Office", isCorrect: false },
+                    { text: "Security Forces Squadron", isCorrect: false },
+                    { text: "Inspector General", isCorrect: false },
+                    { text: "Service Headquarters", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the maximum linear inches for a single checked bag?",
+                options: [
+                    { text: "50 linear inches", isCorrect: false },
+                    { text: "70 linear inches", isCorrect: false },
+                    { text: "60 linear inches", isCorrect: false },
+                    { text: "62 linear inches", isCorrect: true }
+                ]
+            },
+            {
+                question: "Which type of passenger is allowed excess baggage?",
+                options: [
+                    { text: "Space-A", isCorrect: false },
+                    { text: "DV", isCorrect: false },
+                    { text: "Blue Bark", isCorrect: false },
+                    { text: "Space-R", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the maximum weight a single checked bag can be without being considered excess?",
+                options: [
+                    { text: "50 lbs", isCorrect: false },
+                    { text: "60 lbs", isCorrect: false },
+                    { text: "80 lbs", isCorrect: false },
+                    { text: "70 lbs", isCorrect: true }
+                ]
+            },
+            {
+                question: "What are prohibited items?",
+                options: [
+                    { text: "Items that require special handling or declarations.", isCorrect: false },
+                    { text: "Items that are too large or heavy for transport.", isCorrect: false },
+                    { text: "Items that may cause delays in security screening.", isCorrect: false },
+                    { text: "Certain items are never accepted for air travel regardless of whether they are stored in checked or carry-on baggage.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Explain what pooling of baggage means and who can use it?.",
+                options: [
+                    { text: "Combining baggage from multiple flights for efficiency.", isCorrect: false },
+                    { text: "Allowing passengers to check extra bags for a fee.", isCorrect: false },
+                    { text: "Storing baggage temporarily until a later flight.", isCorrect: false },
+                    { text: "When all passengers present themselves and their baggage at the same time during check-in and have the same destination. Passengers traveling as a family or on group orders may pool their baggage.", isCorrect: true }
+                ]
+            },
+            {
+                question: "The four types of identification tags that are available to the passenger are:",
+                options: [
+                    { text: "Checked, Carry-on, Special, Oversized", isCorrect: false },
+                    { text: "Paper, Electronic, Digital, Barcode", isCorrect: false },
+                    { text: "Standard, Priority, Fragile, Perishable", isCorrect: false },
+                    { text: "Personal Luggage ID Tag, Commercial Airline ID Tag, DD Form 1839 (Baggage Identification), AMC Form 20-ID (AMC Baggage Identification Tag)", isCorrect: true }
+                ]
+            },
+            {
+                question: "The AMC Form 20-DV tag is ______ and ______ in color.",
+                options: [
+                    { text: "Blue, white", isCorrect: false },
+                    { text: "Yellow, black", isCorrect: false },
+                    { text: "Red, white", isCorrect: true },
+                    { text: "Pink, white", isCorrect: false }
+                ]
+            },
+            {
+                question: "If the walkthrough magnetometer activates a ________ time, passengers will undergo additional screening.",
+                options: [
+                    { text: "First", isCorrect: false },
+                    { text: "Second", isCorrect: true },
+                    { text: "Third", isCorrect: false },
+                    { text: "Fourth", isCorrect: false }
+                ]
+            },
+            {
+                question: "The AMC Form 20-EL tag is _____ and _____ in color.",
+                options: [
+                    { text: "Blue and Red", isCorrect: false },
+                    { text: "Yellow and Black", isCorrect: true },
+                    { text: "Orange and Purple", isCorrect: false },
+                    { text: "Green and White", isCorrect: false }
+                ]
+            },
+            {
+                question: "Hand-carried baggage on AMC aircraft will be no larger than ____ linear inches.",
+                options: [
+                    { text: "40", isCorrect: false },
+                    { text: "50", isCorrect: false },
+                    { text: "60", isCorrect: false },
+                    { text: "45", isCorrect: true }
+                ]
+            },
+            {
+                question: "Ammunition cannot exceed _____ gross weight and must be carried in checked baggage.",
+                options: [
+                    { text: "5 lbs", isCorrect: false },
+                    { text: "10 lbs", isCorrect: false },
+                    { text: "15 lbs", isCorrect: false },
+                    { text: "11 lbs", isCorrect: true }
+                ]
+            },
+            {
+                question: "Individuals in performance of ____ _____________ or ________ __________ duties are authorized to be armed onboard contracted and military aircraft.",
+                options: [
+                    { text: "Flight attendant, security patrol", isCorrect: false },
+                    { text: "Aircrew, medical staff", isCorrect: false },
+                    { text: "Maintenance, ground support", isCorrect: false },
+                    { text: "Law enforcement, specified security", isCorrect: true }
+                ]
+            },
+            {
+                question: "Who is responsible for ensuring all checked baggage is intact, undamaged, and available to each traveler upon arrival at their destination?",
+                options: [
+                    { text: "Aircraft Crew", isCorrect: false },
+                    { text: "Baggage Handlers", isCorrect: false },
+                    { text: "Security Personnel", isCorrect: false },
+                    { text: "PSA's", isCorrect: true }
+                ]
+            },
+            {
+                question: "After the baggage has been checked in by a PSA, the baggage will be weighed, and that weight documented. Afterwards, where is the baggage placed?",
+                options: [
+                    { text: "In the aircraft cargo hold.", isCorrect: false },
+                    { text: "On the baggage carousel.", isCorrect: false },
+                    { text: "With the passenger at the gate.", isCorrect: false },
+                    { text: "Secure holding area", isCorrect: true }
+                ]
+            },
+            {
+                question: "When 20 or more passengers (10 passengers on KC-10 or KC-46) are booked on a military flight. Passenger Services Agents will do what with the baggage?",
+                options: [
+                    { text: "Store it separately.", isCorrect: false },
+                    { text: "Load it individually.", isCorrect: false },
+                    { text: "Hand-carry it onto the aircraft.", isCorrect: false },
+                    { text: "Palletize the baggage", isCorrect: true }
+                ]
+            },
+            {
+                question: "What form will PSAs fill out when palletizing baggage?",
+                options: [
+                    { text: "DD Form 1348", isCorrect: false },
+                    { text: "AMC Form 70", isCorrect: false },
+                    { text: "AF Form 4128", isCorrect: false },
+                    { text: "DD Form 2775", isCorrect: true }
+                ]
+            },
+            {
+                question: "This type of baggage has reached its destination and will need to be forwarded to baggage claims for passenger pick-up. What type of baggage is this?",
+                options: [
+                    { text: "In-Transit Baggage", isCorrect: false },
+                    { text: "Lost Baggage", isCorrect: false },
+                    { text: "Mishandled Baggage", isCorrect: false },
+                    { text: "Terminating Baggage", isCorrect: true }
+                ]
+            },
+            {
+                question: "How should baggage be sorted?",
+                options: [
+                    { text: "By size and weight.", isCorrect: false },
+                    { text: "By type of item.", isCorrect: false },
+                    { text: "By time of check-in.", isCorrect: false },
+                    { text: "By flight and destination", isCorrect: true }
+                ]
+            },
+            {
+                question: "How should baggage be loaded?",
+                options: [
+                    { text: "In any order.", isCorrect: false },
+                    { text: "By weight distribution.", isCorrect: false },
+                    { text: "From back to front.", isCorrect: false },
+                    { text: "Using the first-off, last-on principle", isCorrect: true }
+                ]
+            },
+            {
+                question: "How should special category baggage be loaded?",
+                options: [
+                    { text: "First, to ensure it's secured.", isCorrect: false },
+                    { text: "In the middle of other baggage.", isCorrect: false },
+                    { text: "Separately in a dedicated compartment.", isCorrect: false },
+                    { text: "After all luggage to ensure quick and off-load delivery to the owner upon arrival at the destination.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Baggage should begin to arrive at the baggage claim area within how many minutes of aircraft blocking time?",
+                options: [
+                    { text: "5 minutes", isCorrect: false },
+                    { text: "10 minutes", isCorrect: false },
+                    { text: "15 minutes", isCorrect: true },
+                    { text: "20 minutes", isCorrect: false }
+                ]
+            },
+            {
+                question: "What baggage claim method should be utilized if the baggage area is considered high risk?",
+                options: [
+                    { text: "Self-service baggage claim", isCorrect: false },
+                    { text: "Open baggage claim", isCorrect: false },
+                    { text: "Curbside baggage claim", isCorrect: false },
+                    { text: "Controlled Baggage Claim", isCorrect: true }
+                ]
+            },
+            {
+                question: "If a baggage claim is lost, what must a PSA do?",
+                options: [
+                    { text: "Immediately file a police report.", isCorrect: false },
+                    { text: "Advise the passenger to contact their airline.", isCorrect: false },
+                    { text: "Search the entire terminal for the baggage.", isCorrect: false },
+                    { text: "Verify the passenger was manifested", isCorrect: true }
+                ]
+            },
+            {
+                question: "The purpose of the ______ ___________ ____________ is to provide a stable means to load and off-load aircrew and passengers from aircraft.",
+                options: [
+                    { text: "Passenger Boarding Bridge", isCorrect: false },
+                    { text: "Mobile Passenger Ramp", isCorrect: false },
+                    { text: "Aircraft Ground Support System", isCorrect: false },
+                    { text: "Truck Mounted Staircase", isCorrect: true }
+                ]
+            },
+            {
+                question: "There are two types of truck-mounted staircases: the -_ staircase and the __________ staircase truck.",
+                options: [
+                    { text: "Narrow-body, regional", isCorrect: false },
+                    { text: "Small, large", isCorrect: false },
+                    { text: "Manual, automatic", isCorrect: false },
+                    { text: "Wide Body, Galaxy", isCorrect: true }
+                ]
+            },
+            {
+                question: "The ________ _________ __________ aids in the loading and off-loading off loose passenger baggage and is commonly used at the belly compartments of commercial aircraft.",
+                options: [
+                    { text: "Forklift", isCorrect: false },
+                    { text: "Baggage Tractor", isCorrect: false },
+                    { text: "Container Loader", isCorrect: false },
+                    { text: "Mobile Baggage Conveyor", isCorrect: true }
+                ]
+            },
+            {
+                question: "The Latrine Service Truck (LST) is used to service aircraft ________________.",
+                options: [
+                    { text: "Fuel tanks", isCorrect: false },
+                    { text: "Water systems", isCorrect: false },
+                    { text: "Galley areas", isCorrect: false },
+                    { text: "Lavatories", isCorrect: true }
+                ]
+            },
+            {
+                question: "The LST has three tanks: The _________ tank, ______ tank, and __________ tank.",
+                options: [
+                    { text: "Water, chemical, cleaning", isCorrect: false },
+                    { text: "Fresh, gray, black", isCorrect: true },
+                    { text: "Holding, collection, disposal", isCorrect: false },
+                    { text: "Waste, rinse, fill", isCorrect: false }
+                ]
+            },
+            {
+                question: "Fleet Service personnel use the _______ _________ _________ to service the aircraft potable water system.",
+                options: [
+                    { text: "Water Dispenser Truck (WDT)", isCorrect: false },
+                    { text: "Water Supply Vehicle (WSV)", isCorrect: false },
+                    { text: "Water Purification Unit (WPU)", isCorrect: false },
+                    { text: "Potable Water Truck (PWT)", isCorrect: true }
+                ]
+            },
+            {
+                question: "The Potable Water Truck is equipped with a ______ gallon water tank.",
+                options: [
+                    { text: "100", isCorrect: false },
+                    { text: "150", isCorrect: false },
+                    { text: "200", isCorrect: false },
+                    { text: "250", isCorrect: true }
+                ]
+            },
+            {
+                question: "After being processed through security, Passenger Service Agents will designate an area for passengers to await their boarding times for aircraft. This is a process called __________.",
+                options: [
+                    { text: "Boarding", isCorrect: false },
+                    { text: "Staging", isCorrect: true },
+                    { text: "Holding", isCorrect: false },
+                    { text: "Gating", isCorrect: false }
+                ]
+            },
+            {
+                question: "PSAs will verify the passenger's ___________ and check the _____ presented against the _______ _________ of the passenger and the air manifest prior being allowed into the gate/sterile area.",
+                options: [
+                    { text: "Name, ticket, seating assignment", isCorrect: false },
+                    { text: "Destination, luggage, flight number", isCorrect: false },
+                    { text: "Age, gender, nationality", isCorrect: false },
+                    { text: "Identification, ID, boarding pass", isCorrect: true }
+                ]
+            },
+            {
+                question: "If a discrepancy is found, PSAs will __________ these discrepancies and notify _______ of any last minute add-ons or changes accomplished at the departure gate.",
+                options: [
+                    { text: "Ignore, leadership", isCorrect: false },
+                    { text: "Document, security", isCorrect: false },
+                    { text: "Correct, aircrew", isCorrect: false },
+                    { text: "Reconcile, dispatch", isCorrect: true }
+                ]
+            },
+            {
+                question: "Who is in charge of communicating with ATOC?",
+                options: [
+                    { text: "The Terminal Manager.", isCorrect: false },
+                    { text: "The Ramp Supervisor.", isCorrect: false },
+                    { text: "The Fleet Service Supervisor.", isCorrect: false },
+                    { text: "The passenger service dispatcher.", isCorrect: true }
+                ]
+            },
+            {
+                question: "To ensure all passengers receive the same information, PSAs conduct a safety briefing for passengers going to/from the aircraft. What is included in the briefing?",
+                options: [
+                    { text: "Aircraft emergency procedures, evacuation routes, life vest usage.", isCorrect: false },
+                    { text: "In-flight entertainment options, meal service times, restroom locations.", isCorrect: false },
+                    { text: "Duty-free shopping, connecting flight information, ground transportation.", isCorrect: false },
+                    { text: "No hats while on the flight line, remain seated while the bus is in motion, secure all items/valuables, OPSEC - no photos on the flight line, Engine Running Onload/Offload (ERO) operations (when applicable), Carry-on baggage should be secured.", isCorrect: true }
+                ]
+            },
+            {
+                question: "What are the three basic methods to transport passengers?",
+                options: [
+                    { text: "Car, train, boat", isCorrect: false },
+                    { text: "Walking, biking, driving", isCorrect: false },
+                    { text: "Shuttle, taxi, ride-share", isCorrect: false },
+                    { text: "Bus/vehicle, walking, jet bridge", isCorrect: true }
+                ]
+            },
+            {
+                question: "What is the most common method to transport passengers at commercial airport?",
+                options: [
+                    { text: "Bus/vehicle", isCorrect: false },
+                    { text: "Walking", isCorrect: false },
+                    { text: "Shuttle", isCorrect: false },
+                    { text: "Jet-Bridge", isCorrect: true }
+                ]
+            },
+            {
+                question: "Which type of passengers will be given the option to on/off-loading first?",
+                options: [
+                    { text: "Families with small children", isCorrect: false },
+                    { text: "Passengers requiring assistance", isCorrect: true },
+                    { text: "Passengers with connecting flights", isCorrect: false },
+                    { text: "DV privileged passengers", isCorrect: false }
+                ]
+            },
+            {
+                question: "Which passengers have arrived at an aerial port but have not reached their final destination?",
+                options: [
+                    { text: "Originating passengers", isCorrect: false },
+                    { text: "Terminating passengers", isCorrect: false },
+                    { text: "Connecting passengers", isCorrect: false },
+                    { text: "In-Transit passengers.", isCorrect: true }
+                ]
+            },
+            {
+                question: "Passengers must have what two items with them when they are re-screened through security?",
+                options: [
+                    { text: "Passport and visa", isCorrect: false },
+                    { text: "Ticket and luggage tag", isCorrect: false },
+                    { text: "Boarding pass and flight itinerary", isCorrect: false },
+                    { text: "ID and boarding pass", isCorrect: true }
+                ]
+            },
+            {
+                question: "Mishandling baggage _______, ______, _________, or _________ items that have entered the airlift system as passengers checked baggage.",
+                options: [
+                    { text: "Found, damaged, repaired, stored", isCorrect: false },
+                    { text: "Missing, misplaced, delivered, returned", isCorrect: false },
+                    { text: "Screened, weighed, tagged, loaded", isCorrect: false },
+                    { text: "Lost, found, damage, pilfered", isCorrect: true }
+                ]
+            },
+            {
+                question: "The ___________ ____________ ____________ can be completed either manually or electorally by completing the mishandled baggag",
+                options: [
+                    { text: "Mishandled Baggage Report", isCorrect: true }, // Assuming this is the correct answer based on context, as the question is cut off
+                    { text: "Lost Property Form", isCorrect: false },
+                    { text: "Claim Adjustment Request", isCorrect: false },
+                    { text: "Baggage Irregularity Log", isCorrect: false }
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const endQuizSection = document.getElementById('end-quiz-section');
+        const finalScoreSpan = document.getElementById('final-score');
+        const averageScoreSpan = document.getElementById('average-score');
+        const reviewBtn = document.getElementById('review-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const reviewModal = document.getElementById('review-modal');
+        const reviewContent = document.getElementById('review-content');
+        const closeReviewModalBtn = document.getElementById('close-review-modal');
+
+        // Quiz State Variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledQuestions = [];
+        let userAnswers = []; // Stores objects like { question: {}, selectedOption: {}, isCorrect: boolean, correctAnswer: {} }
+        let quizAttemptScores = JSON.parse(localStorage.getItem('quizAttemptScores')) || []; // Load past scores from localStorage
+
+        /**
+         * Shuffles an array randomly.
+         * @param {Array} array The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+            }
+            return array;
+        }
+
+        /**
+         * Initializes the quiz: shuffles questions, resets state, and displays the first question.
+         */
+        function initializeQuiz() {
+            shuffledQuestions = shuffleArray([...questions]); // Create a shallow copy to shuffle
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = [];
+
+            quizContainer.classList.remove('hidden');
+            endQuizSection.classList.add('hidden');
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden'); // Next button hidden initially
+
+            displayQuestion();
+            calculateAndDisplayAverageScore();
+        }
+
+        /**
+         * Displays the current question and its shuffled options.
+         */
+        function displayQuestion() {
+            const question = shuffledQuestions[currentQuestionIndex];
+            if (!question) {
+                console.error("No question found at current index.");
+                return;
+            }
+
+            questionText.textContent = `${currentQuestionIndex + 1}. ${question.question}`;
+            optionsContainer.innerHTML = ''; // Clear previous options
+
+            const shuffledOptions = shuffleArray([...question.options]); // Shuffle options for current question
+
+            shuffledOptions.forEach((option, index) => {
+                const optionId = `option-${currentQuestionIndex}-${index}`;
+                const div = document.createElement('div');
+                div.classList.add('relative', 'flex', 'items-center', 'answer-option', 'p-3', 'rounded-lg', 'border', 'border-gray-300', 'cursor-pointer', 'hover:bg-gray-50', 'transition-colors');
+
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = `question-${currentQuestionIndex}`;
+                radio.id = optionId;
+                radio.value = option.text;
+                radio.classList.add('sr-only', 'peer'); // sr-only for screen readers, peer for Tailwind styling
+
+                const label = document.createElement('label');
+                label.htmlFor = optionId;
+                label.textContent = option.text;
+                label.classList.add('flex-grow', 'text-gray-700', 'font-medium', 'cursor-pointer');
+
+                // Visual indicator for selected radio (custom styling)
+                const customRadioIndicator = document.createElement('div');
+                customRadioIndicator.classList.add(
+                    'w-5', 'h-5', 'rounded-full', 'border-2', 'border-blue-400', 'mr-3', 'flex', 'items-center', 'justify-center',
+                    'peer-checked:bg-blue-600', 'peer-checked:border-blue-600', 'transition-all', 'duration-200', 'ease-in-out'
+                );
+                const innerCircle = document.createElement('div');
+                innerCircle.classList.add('w-2.5', 'h-2.5', 'rounded-full', 'bg-white', 'opacity-0', 'peer-checked:opacity-100', 'transition-opacity', 'duration-200', 'ease-in-out');
+                customRadioIndicator.appendChild(innerCircle);
+
+                div.appendChild(radio);
+                div.appendChild(customRadioIndicator);
+                div.appendChild(label);
+                optionsContainer.appendChild(div);
+
+                // Enable submit button if an option is selected
+                radio.addEventListener('change', () => {
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('disabled:opacity-50');
+                });
+            });
+
+            submitBtn.disabled = true; // Disable submit until an option is chosen
+            submitBtn.classList.add('disabled:opacity-50');
+        }
+
+        /**
+         * Handles the submission of an answer.
+         */
+        function handleSubmitAnswer() {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const selectedOptionInput = document.querySelector(`input[name="question-${currentQuestionIndex}"]:checked`);
+
+            if (!selectedOptionInput) {
+                console.warn("No answer selected.");
+                return; // Should not happen if submit button is disabled
+            }
+
+            const selectedAnswerText = selectedOptionInput.value;
+            const selectedOptionElement = selectedOptionInput.closest('.answer-option');
+            const correctAnswer = currentQuestion.options.find(opt => opt.isCorrect);
+            const isCorrect = selectedAnswerText === correctAnswer.text;
+
+            // Apply visual feedback
+            if (isCorrect) {
+                selectedOptionElement.classList.add('correct-answer');
+                score++;
+            } else {
+                selectedOptionElement.classList.add('incorrect-answer');
+                // Highlight the correct answer if the user was wrong
+                const correctOptionElement = Array.from(optionsContainer.children).find(div => {
+                    const label = div.querySelector('label');
+                    return label && label.textContent === correctAnswer.text;
+                });
+                if (correctOptionElement) {
+                    correctOptionElement.classList.add('correct-answer');
+                }
+            }
+
+            // Lock answers: Disable all radio buttons for this question
+            const radioInputs = document.querySelectorAll(`input[name="question-${currentQuestionIndex}"]`);
+            radioInputs.forEach(radio => {
+                radio.disabled = true;
+                radio.classList.add('disabled-radio'); // Add custom class for more styling control if needed
+                radio.nextElementSibling.classList.add('opacity-50', 'cursor-not-allowed'); // Dim custom radio indicator
+            });
+
+            submitBtn.classList.add('hidden'); // Hide submit button
+            nextBtn.classList.remove('hidden'); // Show next button
+
+            // Store user's answer for review
+            userAnswers.push({
+                question: currentQuestion.question,
+                options: currentQuestion.options.map(o => o.text), // Store texts only
+                selectedAnswer: selectedAnswerText,
+                correctAnswer: correctAnswer.text,
+                isCorrect: isCorrect
+            });
+        }
+
+        /**
+         * Moves to the next question or ends the quiz if all questions are answered.
+         */
+        function handleNextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                displayQuestion();
+                submitBtn.classList.remove('hidden'); // Show submit button for next question
+                nextBtn.classList.add('hidden'); // Hide next button
+                submitBtn.disabled = true; // Disable submit until an option is chosen
+                submitBtn.classList.add('disabled:opacity-50');
+            } else {
+                endQuiz();
+            }
+        }
+
+        /**
+         * Ends the quiz, displays final score, and shows end-of-quiz options.
+         */
+        function endQuiz() {
+            quizContainer.classList.add('hidden');
+            endQuizSection.classList.remove('hidden');
+            finalScoreSpan.textContent = `${score} / ${shuffledQuestions.length}`;
+
+            quizAttemptScores.push(score);
+            saveScores(); // Save updated scores to localStorage
+            calculateAndDisplayAverageScore();
+        }
+
+        /**
+         * Calculates and displays the average score from all quiz attempts.
+         */
+        function calculateAndDisplayAverageScore() {
+            if (quizAttemptScores.length === 0) {
+                averageScoreSpan.textContent = "N/A";
+                return;
+            }
+            const totalScoreSum = quizAttemptScores.reduce((sum, currentScore) => sum + currentScore, 0);
+            const totalPossibleScore = quizAttemptScores.length * questions.length; // Assuming all quizzes have same number of questions
+            const averagePercentage = (totalScoreSum / totalPossibleScore * 100).toFixed(2);
+            averageScoreSpan.textContent = `${averagePercentage}%`;
+        }
+
+        /**
+         * Saves quiz attempt scores to localStorage.
+         */
+        function saveScores() {
+            localStorage.setItem('quizAttemptScores', JSON.stringify(quizAttemptScores));
+        }
+
+        /**
+         * Displays the post-test review modal.
+         */
+        function showReview() {
+            reviewContent.innerHTML = ''; // Clear previous review content
+            userAnswers.forEach((qa, index) => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('p-4', 'rounded-lg', 'border', 'mb-4', qa.isCorrect ? 'border-green-300' : 'border-red-300', 'bg-white', 'shadow-sm');
+
+                reviewItem.innerHTML = `
+                    <p class="font-semibold text-lg text-gray-800 mb-2">${index + 1}. ${qa.question}</p>
+                    <ul class="list-disc ml-5 text-gray-700 space-y-1">
+                        ${qa.options.map(option => `
+                            <li class="${option === qa.selectedAnswer ? (qa.isCorrect ? 'text-green-700 font-bold' : 'text-red-700 font-bold') : ''}
+                                       ${option === qa.correctAnswer && !qa.isCorrect ? 'text-green-700 font-bold' : ''}">
+                                ${option}
+                                ${option === qa.selectedAnswer ? ' (Your Answer)' : ''}
+                                ${option === qa.correctAnswer && option !== qa.selectedAnswer ? ' (Correct Answer)' : ''}
+                                ${option === qa.selectedAnswer && qa.isCorrect ? ' &#10003;' : ''} <!-- Checkmark for correct selected -->
+                                ${option === qa.selectedAnswer && !qa.isCorrect ? ' &#10006;' : ''} <!-- X mark for incorrect selected -->
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                reviewContent.appendChild(reviewItem);
+            });
+            reviewModal.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the post-test review modal.
+         */
+        function closeReview() {
+            reviewModal.classList.add('hidden');
+        }
+
+        // Event Listeners
+        submitBtn.addEventListener('click', handleSubmitAnswer);
+        nextBtn.addEventListener('click', handleNextQuestion);
+        restartBtn.addEventListener('click', initializeQuiz);
+        reviewBtn.addEventListener('click', showReview);
+        closeReviewModalBtn.addEventListener('click', closeReview);
+        reviewModal.addEventListener('click', (e) => { // Close modal when clicking outside content
+            if (e.target === reviewModal) {
+                closeReview();
+            }
+        });
+
+        // Initialize the quiz when the page loads
+        document.addEventListener('DOMContentLoaded', initializeQuiz);
+    </script>
+
+<script src="https://static.app/js/static.js" type="text/javascript"></script>
+</body>
+</html>
